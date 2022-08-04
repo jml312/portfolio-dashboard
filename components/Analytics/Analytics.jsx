@@ -1,13 +1,17 @@
-import { Title, Container, Grid, Skeleton, Text } from "@mantine/core";
+import { Title, Container, Grid } from "@mantine/core";
 import Pages from "./Pages";
 import Devices from "./Devices";
 import Referrers from "./Referrers";
 import Locations from "./Locations";
 import Table from "./Table";
 import Graph from "./Graph";
+import { useMediaQuery } from "@mantine/hooks";
+import { useState } from "react";
 
 export default function Analytics({
   analytics: {
+    all,
+    locations,
     topPages,
     topReferrers,
     topCountries,
@@ -16,19 +20,27 @@ export default function Analytics({
     topDevices,
     topBrowsers,
     topOS,
-    all,
-    locations,
   },
   isLoggedIn,
+  analyticsRef,
 }) {
+  const [data, setData] = useState(all);
+  const isSmall = useMediaQuery("(max-width: 450px)");
   return (
-    <Container fluid mt={32}>
+    <Container
+      fluid
+      mt={32}
+      ref={analyticsRef}
+      sx={{
+        scrollMarginTop: "60px",
+      }}
+    >
       <Title order={1} mb={8}>
         Analytics
       </Title>
-      <Grid cols={2} gro gutter="lg">
+      <Grid cols={2} gutter="lg">
         <Grid.Col sm={12} md={12}>
-          <Graph />
+          <Graph all={data} isSmall={isSmall} />
         </Grid.Col>
         <Grid.Col sm={12} md={6}>
           <Locations
@@ -38,10 +50,11 @@ export default function Analytics({
               regions: topRegions,
               countries: topCountries,
             }}
+            isSmall={isSmall}
           />
         </Grid.Col>
         <Grid.Col sm={12} md={6}>
-          <Pages pages={topPages} />
+          <Pages pages={topPages} isSmall={isSmall} />
         </Grid.Col>
         <Grid.Col sm={12} md={6}>
           <Devices
@@ -50,13 +63,14 @@ export default function Analytics({
               browsers: topBrowsers,
               os: topOS,
             }}
+            isSmall={isSmall}
           />
         </Grid.Col>
         <Grid.Col sm={12} md={6}>
-          <Referrers referrers={topReferrers} />
+          <Referrers referrers={topReferrers} isSmall={isSmall} />
         </Grid.Col>
       </Grid>
-      <Table data={all} isLoggedIn={isLoggedIn} />
+      <Table data={data} setData={setData} isLoggedIn={isLoggedIn} />
     </Container>
   );
 }

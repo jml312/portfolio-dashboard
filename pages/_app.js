@@ -13,7 +13,10 @@ import {
 import { useLocalStorage, useHotkeys } from "@mantine/hooks";
 import { NotificationsProvider } from "@mantine/notifications";
 import { ModalsProvider } from "@mantine/modals";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { LazyMotion } from "framer-motion";
+import { NextSeo } from "next-seo";
+import SEO from "seo";
 
 function MyApp({ Component, pageProps }) {
   const [colorScheme, setColorScheme] = useLocalStorage({
@@ -23,7 +26,7 @@ function MyApp({ Component, pageProps }) {
   });
   const toggleColorScheme = () =>
     setColorScheme(colorScheme === "dark" ? "light" : "dark");
-  useHotkeys([["mod+J", () => toggleColorScheme()]]);
+  useHotkeys([["J", () => toggleColorScheme()]]);
 
   const ConfirmModal = ({ innerProps }) => {
     const [isLoading, setIsLoading] = useState(false);
@@ -57,31 +60,6 @@ function MyApp({ Component, pageProps }) {
     );
   };
 
-  const [start, setStart] = useState(new Date().getTime());
-
-  // useEffect(() => {
-  //   console.log("Called", new Date().getTime());
-  //   setStart(new Date().getTime());
-  // }, []);
-
-  useEffect(() => {
-    document.addEventListener("visibilitychange", function logData() {
-      if (document.visibilityState === "hidden") {
-        localStorage.setItem("lastActive", new Date().getTime());
-        const end = new Date().getTime();
-        const totalTime = (end - start) / 1000;
-        // console.log(totalTime);
-        // navigator.sendBeacon(
-        //   `https://dbjl1.free.beeceptor.com/log/${totalTime}`,
-        //   "stuff"
-        // );
-      } else {
-        console.log("Called", new Date().getTime());
-        setStart(new Date().getTime());
-      }
-    });
-  }, []);
-
   return (
     <ColorSchemeProvider
       colorScheme={colorScheme}
@@ -96,7 +74,17 @@ function MyApp({ Component, pageProps }) {
           modals={{ confirm: ConfirmModal, content: ContentModal }}
         >
           <NotificationsProvider>
-            <Component {...pageProps} />
+            <LazyMotion
+              features={() =>
+                import("framerMotionFeatures").then(
+                  ({ default: features }) => features
+                )
+              }
+              strict
+            >
+              <NextSeo {...SEO} />
+              <Component {...pageProps} />
+            </LazyMotion>
           </NotificationsProvider>
         </ModalsProvider>
       </MantineProvider>

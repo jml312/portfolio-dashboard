@@ -6,13 +6,18 @@ import {
   useMantineColorScheme,
   ScrollArea,
 } from "@mantine/core";
-import { useMediaQuery } from "@mantine/hooks";
 import { useState } from "react";
 import abbreviate from "number-abbreviate";
 import dynamic from "next/dynamic";
 const Map = dynamic(() => import("./Map"), { ssr: false });
 
-export default function AnalyticsCard({ title, subTitle, tabs, data }) {
+export default function AnalyticsCard({
+  title,
+  subTitle,
+  tabs,
+  data,
+  isSmall,
+}) {
   const [activeTab, setActiveTab] = useState(tabs?.length && tabs[0]);
   const [activeData, setActiveData] = useState(
     Array.isArray(data) ? data : data[activeTab.key]
@@ -24,7 +29,6 @@ export default function AnalyticsCard({ title, subTitle, tabs, data }) {
   const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
   const { colorScheme } = useMantineColorScheme();
   const dark = colorScheme === "dark";
-  const isSmall = useMediaQuery("(max-width: 450px)");
 
   return (
     <Container
@@ -56,7 +60,7 @@ export default function AnalyticsCard({ title, subTitle, tabs, data }) {
             width: "100%",
             display: "flex",
             justifyContent: "space-between",
-            alignItems: "center",
+            alignItems: isSmall ? "start" : "center",
             padding: "0",
           }}
         >
@@ -70,6 +74,7 @@ export default function AnalyticsCard({ title, subTitle, tabs, data }) {
               sx={{
                 display: "flex",
                 flexDirection: isSmall ? "column" : "row",
+                alignItems: "end",
                 margin: "0",
                 padding: "0",
                 fontWeight: "500",

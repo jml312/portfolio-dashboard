@@ -1,6 +1,6 @@
 import AnalyticsCard from "./AnalyticsCard";
 
-export default function Devices({ devices }) {
+export default function Devices({ devices, isSmall }) {
   return (
     <AnalyticsCard
       title="Devices"
@@ -28,6 +28,7 @@ export default function Devices({ devices }) {
           longName: "Operating system",
         },
       ]}
+      isSmall={isSmall}
     />
   );
 }

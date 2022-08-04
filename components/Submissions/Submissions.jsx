@@ -21,15 +21,23 @@ import { showNotification } from "@mantine/notifications";
 
 const headers = ["Name", "Email", "Message", "Date", "Is Read", "Actions"];
 
-export default function Submissions({ submissions, isLoggedIn }) {
+export default function Submissions({
+  submissions,
+  isLoggedIn,
+  submissionsRef,
+}) {
   const [search, setSearch] = useState("");
   const [rows, setRows] = useState([...submissions]);
   const [activeRowId, setActiveRowId] = useState("");
   const [activeRowActionType, setActiveRowActionType] = useState("");
   const [activePage, setPage] = useState(1);
   const numberInputRef = useRef();
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(
+    rows.length >= 5 ? 10 : rows.length === 1 ? 1 : 5
+  );
   const TOTAL_PAGES = Math.max(Math.ceil(rows?.length / rowsPerPage), 1);
+  const MAX_ROWS_PER_PAGE =
+    rows.length >= 5 ? Math.min(100, Math.ceil(rows.length / 5) * 5) : 1;
 
   const modals = useModals();
   const openConfirmModal = () => {
@@ -152,7 +160,14 @@ export default function Submissions({ submissions, isLoggedIn }) {
   }, [activeRowId, activeRowActionType]);
 
   return (
-    <Container fluid mt={32}>
+    <Container
+      fluid
+      mt={32}
+      ref={submissionsRef}
+      sx={{
+        scrollMarginTop: "60px",
+      }}
+    >
       <Title order={1} mb={8}>
         Submissions
       </Title>
@@ -196,6 +211,7 @@ export default function Submissions({ submissions, isLoggedIn }) {
                           modals.openContextModal("content", {
                             title: "Message",
                             centered: true,
+                            overflow: "inside",
                             closeOnClickOutside: true,
                             innerProps: {
                               modalBody: message,
@@ -249,8 +265,8 @@ export default function Submissions({ submissions, isLoggedIn }) {
             )}
           </tbody>
         </Table>
-        <Group grow>
-          {rows.length > 0 && (
+        {rows.length > 0 && (
+          <Group grow>
             <Pagination
               mt={8}
               total={TOTAL_PAGES}
@@ -258,8 +274,7 @@ export default function Submissions({ submissions, isLoggedIn }) {
               onChange={setPage}
               withEdges={TOTAL_PAGES > 5}
             />
-          )}
-          {submissions.length > 10 && (
+
             <Group spacing={5} mt={8} sx={{ justifyContent: "flex-end" }}>
               <ActionIcon
                 size={32}
@@ -273,10 +288,13 @@ export default function Submissions({ submissions, isLoggedIn }) {
                 hideControls
                 readOnly
                 value={rowsPerPage}
-                onChange={(val) => setRowsPerPage(val)}
+                onChange={(val) => {
+                  setPage(1);
+                  setRowsPerPage(val);
+                }}
                 handlersRef={numberInputRef}
                 min={1}
-                max={100}
+                max={MAX_ROWS_PER_PAGE}
                 step={rowsPerPage === 1 ? 4 : 5}
                 size={32}
                 styles={{
@@ -285,15 +303,15 @@ export default function Submissions({ submissions, isLoggedIn }) {
               />
               <ActionIcon
                 size={32}
-                disabled={rowsPerPage === 100}
+                disabled={rowsPerPage === MAX_ROWS_PER_PAGE}
                 variant="default"
                 onClick={() => numberInputRef.current.increment()}
               >
                 +
               </ActionIcon>
             </Group>
-          )}
-        </Group>
+          </Group>
+        )}
       </ScrollArea>
     </Container>
   );

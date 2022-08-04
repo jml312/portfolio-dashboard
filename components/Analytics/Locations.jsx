@@ -1,6 +1,6 @@
 import AnalyticsCard from "./AnalyticsCard";
 
-export default function Locations({ locations }) {
+export default function Locations({ locations, isSmall }) {
   return (
     <AnalyticsCard
       title="Locations"
@@ -27,6 +27,7 @@ export default function Locations({ locations }) {
           longName: "Country",
         },
       ]}
+      isSmall={isSmall}
     />
   );
 }

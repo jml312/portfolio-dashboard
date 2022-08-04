@@ -9,7 +9,7 @@ import {
 import { ExternalLink } from "tabler-icons-react";
 import { differenceInDays } from "date-fns";
 
-export default function Services({ isLoggedIn, services }) {
+export default function Services({ isLoggedIn, services, servicesRef }) {
   const headers = [
     "Name",
     "Service",
@@ -21,7 +21,14 @@ export default function Services({ isLoggedIn, services }) {
   ];
 
   return (
-    <Container fluid mt={32}>
+    <Container
+      fluid
+      mt={32}
+      ref={servicesRef}
+      sx={{
+        scrollMarginTop: "60px",
+      }}
+    >
       <Title order={1} mb={8}>
         Services
       </Title>
@@ -40,21 +47,22 @@ export default function Services({ isLoggedIn, services }) {
           <tbody>
             {services.map(
               ({ name, service, expiresOn, rateLimit, pricing, link }) => {
-                const dayDifference = expiresOn
-                  ? differenceInDays(new Date(expiresOn), new Date())
-                  : "-";
+                const dayDifference =
+                  expiresOn !== "-"
+                    ? differenceInDays(new Date(expiresOn), new Date())
+                    : expiresOn;
                 const isUrgent = dayDifference !== "-" && dayDifference <= 7;
                 return (
                   <tr key={service.name}>
                     <td>{name}</td>
                     <td>{service}</td>
                     <td>{rateLimit ?? "-"}</td>
-                    <td>{pricing ?? "-"}</td>
+                    <td>{pricing}</td>
                     <td>{expiresOn ?? "-"}</td>
                     <td>
-                      {isUrgent || dayDifference !== "-" ? (
-                        <Badge color={isUrgent ? "red" : "gray"}>
-                          {dayDifference}
+                      {dayDifference !== "-" ? (
+                        <Badge color={isUrgent && isLoggedIn ? "red" : "gray"}>
+                          {isLoggedIn ? dayDifference : "-"}
                         </Badge>
                       ) : (
                         "-"

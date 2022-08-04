@@ -1,0 +1,2 @@
+User-agent: *
+Sitemap: https://www.dashboard.joshlevy.io/sitemap.xml

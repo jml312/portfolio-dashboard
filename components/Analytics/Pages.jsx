@@ -1,5 +1,12 @@
 import AnalyticsCard from "./AnalyticsCard";
 
-export default function Pages({ pages }) {
-  return <AnalyticsCard title="Top Pages" subTitle="Page" data={pages} />;
+export default function Pages({ pages, isSmall }) {
+  return (
+    <AnalyticsCard
+      title="Top Pages"
+      subTitle="Page"
+      data={pages}
+      isSmall={isSmall}
+    />
+  );
 }

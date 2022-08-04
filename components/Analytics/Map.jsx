@@ -1,23 +1,12 @@
 import ReactMapGL, { Marker, Popup } from "react-map-gl";
-import { useState, useMemo, useEffect, memo } from "react";
+import { useState, useEffect, memo } from "react";
 import { LoadingOverlay, ActionIcon, Tooltip } from "@mantine/core";
 import { MapPin, FocusCentered } from "tabler-icons-react";
 
 const Map = memo(function Map({ data, dark }) {
-  const [averageLat, averageLong] = useMemo(
-    () =>
-      data
-        .reduce(
-          (acc, curr) =>
-            curr.latLong.split(", ").map((el, i) => Number(el) + acc[i]),
-          [0, 0]
-        )
-        .map((el) => Number((el / data.length).toFixed(2))),
-    []
-  );
   const initialViewState = {
-    latitude: averageLat,
-    longitude: averageLong,
+    latitude: 37.0902,
+    longitude: -95.7129,
     zoom: 0.25,
     bearing: 0,
     pitch: 0,
@@ -47,7 +36,6 @@ const Map = memo(function Map({ data, dark }) {
   return (
     <>
       <LoadingOverlay visible={isMapLoading} overlayBlur={2} />
-
       <ReactMapGL
         onLoad={() => setIsMapLoading(false)}
         mapStyle={mapStyle}
@@ -86,7 +74,7 @@ const Map = memo(function Map({ data, dark }) {
           </Tooltip>
         </ActionIcon>
 
-        {data.map(({ latLong, location, views }) => {
+        {data.map(({ location, latLong, visitors }) => {
           const [lat, long] = latLong.split(", ");
           return (
             <Marker
@@ -97,7 +85,7 @@ const Map = memo(function Map({ data, dark }) {
             >
               <MapPin
                 onMouseEnter={() =>
-                  setPopupInfo({ location, lat, long, views })
+                  setPopupInfo({ location, lat, long, visitors })
                 }
                 onMouseLeave={() => setPopupInfo(null)}
                 color="rgba(34,139,230,.85)"
@@ -118,8 +106,8 @@ const Map = memo(function Map({ data, dark }) {
                 color: "#000",
               }}
             >
-              {popupInfo.location} <br /> {popupInfo.views} view
-              {popupInfo.views > 1 ? "s" : ""}
+              {popupInfo.location} <br /> {popupInfo.visitors} view
+              {popupInfo.visitors > 1 ? "s" : ""}
             </div>
           </Popup>
         )}

@@ -6,26 +6,15 @@ import {
   ActionIcon,
   NumberInput,
   Table as MantineTable,
-  MultiSelect,
-  Tabs,
   Checkbox,
   createStyles,
 } from "@mantine/core";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useMemo } from "react";
 import { useModals } from "@mantine/modals";
 import axios from "axios";
 import { showNotification } from "@mantine/notifications";
-import { Trash } from "tabler-icons-react";
-
-const headers = [
-  "City",
-  "Region",
-  "Country Name",
-  "Device",
-  "Browser",
-  "OS",
-  "Visits",
-];
+import { Trash, Minus } from "tabler-icons-react";
+import { format } from "date-fns";
 
 const useStyles = createStyles((theme) => ({
   rowSelected: {
@@ -36,59 +25,117 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-const uniqueValues = (arr, key) => [
-  ...new Map(arr.map((item) => [item[key], item])).values(),
-];
-
-export default function Table({ data, isLoggedIn }) {
-  const [selectedPage, setSelectedPage] = useState("Home");
-  const [rows, setRows] = useState(
-    uniqueValues(data.find((el) => el.page === selectedPage).visitors, "ip")
+export default function Table({ data, setData, isLoggedIn }) {
+  const rows = useMemo(
+    () =>
+      data
+        .flatMap(({ page, slug, visitors }) =>
+          visitors.flatMap(({ viewings, device, os, browser, ip }) =>
+            viewings.map(
+              ({ locationShort, flag, date, timeSpent, referrer }) => ({
+                ip,
+                slug,
+                page,
+                referrer,
+                location: `${locationShort} ${flag}`,
+                timeSpent,
+                date,
+                device,
+                os,
+                browser,
+                viewings: viewings.length,
+              })
+            )
+          )
+        )
+        .sort((a, b) => new Date(b.date) - new Date(a.date)),
+    [data]
   );
-  const [selectedCities, setSelectedCities] = useState([]);
   const [activePage, setPage] = useState(1);
   const numberInputRef = useRef();
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(
+    rows.length >= 5 ? 10 : rows.length === 1 ? 1 : 5
+  );
   const TOTAL_PAGES = Math.max(Math.ceil(rows?.length / rowsPerPage), 1);
+  const MAX_ROWS_PER_PAGE = Math.min(100, Math.ceil(rows.length / 5) * 5);
 
-  const [selectedRowIPS, setSelectedRowIPS] = useState([]);
-  const multipleSelectedRowIPS = selectedRowIPS.length > 1;
+  const [selectedRows, setSelectedRows] = useState([]);
+  const multipleSelectedRows = selectedRows.length > 1;
   const { classes, cx } = useStyles();
-  const toggleRow = (ip) =>
-    setSelectedRowIPS((current) =>
-      current.includes(ip)
-        ? current.filter((item) => item !== ip)
-        : [...current, ip]
+  const toggleRow = ({ date, ip, slug }) =>
+    setSelectedRows((current) =>
+      current.some((row) => row.date === date && row.ip === ip)
+        ? current.filter((item) => item.date !== date && item.ip !== ip)
+        : [...current, { date, ip, slug }]
     );
+
+  const pluralize = (first, second) => (multipleSelectedRows ? first : second);
 
   const modals = useModals();
   const openDeleteModal = () => {
     const deleteModalId = modals.openContextModal("confirm", {
-      title: "Delete submission",
+      title: `Delete view${pluralize("s", "")}`,
       centered: true,
       closeOnClickOutside: true,
       innerProps: {
-        modalBody: `Are you sure you want to delete ${
-          multipleSelectedRowIPS ? "these" : "this"
-        } page view${multipleSelectedRowIPS ? "" : "s"}?`,
+        modalBody: `Are you sure you want to delete ${pluralize(
+          selectedRows.length === rows.length ? "all" : "these",
+          "this"
+        )} page view${pluralize("s", "")}?`,
         confirmButtonColor: "red",
         onClose: () => modals.closeModal(deleteModalId),
         onConfirm: async () => {
           try {
-            await axios.delete();
-            setRows(data.filter(({ ip }) => !selectedRowIPS.includes(ip)));
-            setSelectedRowIPS([]);
+            const groupedIPS = selectedRows.reduce(
+              (acc, { date, ip, slug }) => {
+                if (slug in acc) {
+                  if (ip in acc[slug]) {
+                    acc[slug][ip].push(date);
+                  } else {
+                    acc[slug][ip] = [date];
+                  }
+                } else {
+                  acc[slug] = { [ip]: [date] };
+                }
+                return acc;
+              },
+              {}
+            );
+            await axios.delete("/api/views/delete", {
+              data: groupedIPS,
+            });
+            const updatedData = data.map(({ visitors, ...rest }) => {
+              const filteredVisitors = visitors.map(
+                ({ viewings, ip: viewIp, ...viewingsRest }) => {
+                  const filteredViewings = viewings.filter(
+                    ({ date: viewDate }) =>
+                      !selectedRows.some(
+                        ({ date: selectedDate, ip: selectedIp }) =>
+                          viewDate === selectedDate && viewIp === selectedIp
+                      )
+                  );
+                  return { viewings: filteredViewings, ...viewingsRest };
+                }
+              );
+              return {
+                ...rest,
+                views: filteredVisitors.reduce(
+                  (acc, { viewings }) => acc + viewings.length,
+                  0
+                ),
+                visitors: filteredVisitors,
+              };
+            });
+            setData([...updatedData]);
+            setSelectedRows([]);
             modals.closeModal(deleteModalId);
             showNotification({
-              title: `Page ${
-                multipleSelectedRowIPS ? "Views" : "View"
-              } Deleted`,
-              message: `${multipleSelectedRowIPS ? "These" : "This"} page ${
-                multipleSelectedRowIPS ? "views" : "view"
-              } ${multipleSelectedRowIPS ? "have" : "has"} been deleted.`,
+              title: `Page ${pluralize("Views", "View")} Deleted`,
+              message: `Page ${pluralize("views", "view")} deleted.`,
               color: "green",
             });
-          } catch {
+          } catch (e) {
+            console.log(e);
             modals.closeModal(deleteModalId);
             showNotification({
               title: "Error",
@@ -101,70 +148,63 @@ export default function Table({ data, isLoggedIn }) {
     });
   };
 
-  useEffect(() => {
-    const visitors = data.find((el) => el.page === selectedPage).visitors;
-    if (selectedCities.length) {
-      setRows(visitors.filter(({ city }) => selectedCities.includes(city)));
-    } else {
-      setRows(uniqueValues(visitors, "ip"));
-    }
-  }, [selectedCities]);
+  const formatTime = (value) => {
+    const minutes = Math.floor(value / 60);
+    const seconds = (value % 60).toFixed(1).toString();
+    return minutes > 0 && seconds > 0
+      ? `${minutes}m ${seconds.replace(".0", "")}s`
+      : seconds > 0 && !minutes
+      ? `${seconds.replace(".0", "")}s`
+      : `${minutes}m`;
+  };
+
+  const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
   return (
     <Container fluid mt={16}>
       <ScrollArea>
-        <MultiSelect
-          mb={8}
-          data={uniqueValues(
-            data.find((el) => el.page === selectedPage).visitors,
-            "city"
-          ).map(({ city, region, countryName }) => ({
-            value: city,
-            label: `${city}, ${region}, ${countryName}`,
-          }))}
-          label="Filter by cities"
-          placeholder="Pick all that you like"
-          onChange={(val) => setSelectedCities(val)}
-          maxDropdownHeight={160}
-          searchable
-          nothingFound="Nothing found"
-          clearButtonLabel="Clear selection"
-          clearable
-          clearSearchOnChange
-        />
-        {/* <Tabs></Tabs> */}
-
         <MantineTable>
+          <caption
+            style={{
+              textAlign: "left",
+            }}
+          >
+            {rows.length} Total Visitors
+          </caption>
           <thead>
             <tr>
-              <th style={{ width: 40 }}>
-                {/* only select rows from current paginated page */}
-                <Checkbox
-                  onChange={() =>
-                    setSelectedRowIPS((current) =>
-                      current.length === rows.length
-                        ? []
-                        : rows.map((item) => item.ip)
-                    )
-                  }
-                  checked={selectedRowIPS.length === rows.length}
-                  indeterminate={
-                    selectedRowIPS.length > 0 &&
-                    selectedRowIPS.length !== rows.length
-                  }
-                  transitionDuration={0}
-                />
-                {selectedRowIPS.length > 0 && (
+              <th>
+                <Group
+                  position="start"
+                  sx={{
+                    transform: "translateX(-0.25rem)",
+                  }}
+                >
                   <ActionIcon
                     onClick={openDeleteModal}
-                    disabled={!isLoggedIn || selectedRowIPS.length === 0}
+                    disabled={!isLoggedIn || selectedRows.length === 0}
                     color="red"
                   >
                     <Trash size={16} />
                   </ActionIcon>
-                )}
+                  {selectedRows.length && (
+                    <ActionIcon onClick={() => setSelectedRows([])}>
+                      <Minus size={16} />
+                    </ActionIcon>
+                  )}
+                </Group>
               </th>
-              {headers.map((header) => (
+              {[
+                "Page",
+                "Referrer",
+                "Location",
+                "Duration",
+                "Date",
+                "Device",
+                "Browser",
+                "OS",
+                "Viewings",
+              ].map((header) => (
                 <th key={header}>{header}</th>
               ))}
             </tr>
@@ -174,35 +214,61 @@ export default function Table({ data, isLoggedIn }) {
               .slice((activePage - 1) * rowsPerPage, activePage * rowsPerPage)
               .map(
                 ({
-                  city,
-                  region,
-                  countryName,
+                  slug,
+                  ip,
+                  page,
+                  referrer,
+                  location,
+                  timeSpent,
+                  date,
                   device,
                   browser,
                   os,
-                  viewDates,
-                  ip,
+                  viewings,
                 }) => {
-                  const isSelected = selectedRowIPS.includes(ip);
+                  const isSelected = selectedRows.some(
+                    (row) => row.date === date && row.ip === ip
+                  );
                   return (
                     <tr
-                      key={ip}
-                      className={cx({ [classes.rowSelected]: isSelected })}
+                      key={date}
+                      className={cx({
+                        [classes.rowSelected]: isSelected,
+                      })}
                     >
                       <td>
                         <Checkbox
+                          sx={{
+                            width: "min-content",
+                            borderRadius: "0.25rem",
+                            cursor: "pointer",
+                          }}
                           checked={isSelected}
-                          onChange={() => toggleRow(ip)}
+                          onChange={() =>
+                            toggleRow({
+                              slug,
+                              date,
+                              ip,
+                            })
+                          }
                           transitionDuration={0}
                         />
                       </td>
-                      <td>{city}</td>
-                      <td>{region}</td>
-                      <td>{countryName}</td>
+                      <td>{page}</td>
+                      <td>{referrer}</td>
+                      <td>{location}</td>
+                      <td>{formatTime(timeSpent)}</td>
+                      <td>{format(new Date(date), "MMM dd, yyyy h:mm a")}</td>
                       <td>{device}</td>
-                      <td>{browser}</td>
-                      <td>{os === "null" ? "Unknown" : os}</td>
-                      <td>{viewDates.length}</td>
+                      <td>
+                        {browser.toLowerCase() === "ios"
+                          ? "IOS"
+                          : capitalize(browser)}
+                      </td>
+                      <td>
+                        {os.toLowerCase() === "ios" ? "IOS" : capitalize(os)}
+                      </td>
+                      <td>{viewings}</td>
                     </tr>
                   );
                 }
@@ -231,10 +297,13 @@ export default function Table({ data, isLoggedIn }) {
               hideControls
               readOnly
               value={rowsPerPage}
-              onChange={(val) => setRowsPerPage(val)}
+              onChange={(val) => {
+                setPage(1);
+                setRowsPerPage(val);
+              }}
               handlersRef={numberInputRef}
               min={1}
-              max={100}
+              max={MAX_ROWS_PER_PAGE}
               step={rowsPerPage === 1 ? 4 : 5}
               size={32}
               styles={{
@@ -243,7 +312,7 @@ export default function Table({ data, isLoggedIn }) {
             />
             <ActionIcon
               size={32}
-              disabled={rowsPerPage === 100}
+              disabled={rowsPerPage === MAX_ROWS_PER_PAGE}
               variant="default"
               onClick={() => numberInputRef.current.increment()}
             >
@@ -255,10 +324,3 @@ export default function Table({ data, isLoggedIn }) {
     </Container>
   );
 }
-
-// Tabs for each page in table (top left)
-// Multi select for city search (select multiple cities)
-
-// selectable table - https://ui.mantine.dev/category/tables - delete icon appears when rows are selected
-
-// pagination, row limit at bottom
