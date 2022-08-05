@@ -42,7 +42,7 @@ const getTimeRangeData = (timeRange) => {
     case "all-time":
       return {
         current: eachMonthOfInterval({
-          start: new Date(2022, 6, 29),
+          start: new Date(2022, 7, 5), // all-time start date
           end: now,
         })
           .map((date) => ({
