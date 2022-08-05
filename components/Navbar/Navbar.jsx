@@ -165,7 +165,7 @@ export default function Navbar({
   ];
 
   return (
-    <Header height={56} className={classes.header} mb={120}>
+    <Header height={56} className={classes.header} mb={120} ref={dropdownRef}>
       <div className={classes.inner}>
         <Group>dashboard</Group>
         <Group>
@@ -195,7 +195,7 @@ export default function Navbar({
                     }}
                     key={label}
                     onClick={() =>
-                      ref?.current?.scrollIntoView({
+                      ref.current.scrollIntoView({
                         behavior: "smooth",
                       })
                     }
@@ -226,12 +226,7 @@ export default function Navbar({
             mounted={opened}
           >
             {(styles) => (
-              <Paper
-                className={classes.dropdown}
-                withBorder
-                style={styles}
-                ref={dropdownRef}
-              >
+              <Paper className={classes.dropdown} withBorder style={styles}>
                 <Stack>
                   {links.map(({ label, ref }) => (
                     <Anchor
@@ -240,7 +235,7 @@ export default function Navbar({
                       }}
                       key={label}
                       onClick={() => {
-                        ref?.current?.scrollIntoView({
+                        ref.current.scrollIntoView({
                           behavior: "smooth",
                         });
                         close();
