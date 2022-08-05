@@ -33,6 +33,18 @@ ChartJS.register(
   Filler
 );
 
+const selectItem = forwardRef(({ label, ...others }, ref) => (
+  <div ref={ref} {...others}>
+    <Group position="apart" noWrap>
+      <Text size="sm">{label}</Text>
+      <Text size="sm">
+        {label.startsWith("All") ? "A" : label[0].toUpperCase()}
+      </Text>
+    </Group>
+  </div>
+));
+selectItem.displayName = "SelectItem";
+
 export default function Graph({ all, isSmall, dark }) {
   const [timeRange, setTimeRange] = useState("all-time");
   const [datasetTitle, setDatasetTitle] = useState("Unique Visitors");
@@ -232,16 +244,7 @@ export default function Graph({ all, isSmall, dark }) {
           />
         </Group>
         <Select
-          itemComponent={forwardRef(({ label, ...others }, ref) => (
-            <div ref={ref} {...others}>
-              <Group position="apart" noWrap>
-                <Text size="sm">{label}</Text>
-                <Text size="sm">
-                  {label.startsWith("All") ? "A" : label[0].toUpperCase()}
-                </Text>
-              </Group>
-            </div>
-          ))}
+          itemComponent={selectItem}
           value={timeRange}
           onChange={setTimeRange}
           data={[
