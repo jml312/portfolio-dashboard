@@ -31,6 +31,10 @@ const SEO = {
       href: "/logo/favicon.ico",
     },
     {
+      rel: "stylesheet",
+      href: "https://api.mapbox.com/mapbox-gl-js/v0.51.0/mapbox-gl.css",
+    },
+    {
       rel: "apple-touch-icon",
       sizes: "180x180",
       href: "/logo/apple-touch-icon.png",

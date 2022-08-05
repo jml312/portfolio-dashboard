@@ -14,7 +14,7 @@ export default function Services({ isLoggedIn, services, servicesRef }) {
     "Name",
     "Service",
     "Rate Limit",
-    "Pricing",
+    "Price",
     "Expires On",
     "Days Left",
     "Link",

@@ -1,6 +1,6 @@
 import AnalyticsCard from "./AnalyticsCard";
 
-export default function Locations({ locations, isSmall }) {
+export default function Locations({ locations, isSmall, dark }) {
   return (
     <AnalyticsCard
       title="Locations"
@@ -28,6 +28,7 @@ export default function Locations({ locations, isSmall }) {
         },
       ]}
       isSmall={isSmall}
+      dark={dark}
     />
   );
 }

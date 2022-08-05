@@ -65,7 +65,7 @@ export default function Table({ data, setData, isLoggedIn }) {
   const toggleRow = ({ date, ip, slug }) =>
     setSelectedRows((current) =>
       current.some((row) => row.date === date && row.ip === ip)
-        ? current.filter((item) => item.date !== date && item.ip !== ip)
+        ? current.filter((item) => item.date !== date)
         : [...current, { date, ip, slug }]
     );
 
@@ -174,22 +174,22 @@ export default function Table({ data, setData, isLoggedIn }) {
           <thead>
             <tr>
               <th>
-                <Group
-                  position="start"
-                  sx={{
-                    transform: "translateX(-0.25rem)",
-                  }}
-                >
+                <Group position="start">
                   <ActionIcon
                     onClick={openDeleteModal}
                     disabled={!isLoggedIn || selectedRows.length === 0}
                     color="red"
+                    size="sm"
                   >
-                    <Trash size={16} />
+                    <Trash size={12} />
                   </ActionIcon>
                   {selectedRows.length && (
-                    <ActionIcon onClick={() => setSelectedRows([])}>
-                      <Minus size={16} />
+                    <ActionIcon
+                      onClick={() => setSelectedRows([])}
+                      size="sm"
+                      variant="filled"
+                    >
+                      <Minus size={12} />
                     </ActionIcon>
                   )}
                 </Group>

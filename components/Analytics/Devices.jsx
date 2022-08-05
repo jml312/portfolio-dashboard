@@ -1,6 +1,6 @@
 import AnalyticsCard from "./AnalyticsCard";
 
-export default function Devices({ devices, isSmall }) {
+export default function Devices({ devices, isSmall, dark }) {
   return (
     <AnalyticsCard
       title="Devices"
@@ -29,6 +29,7 @@ export default function Devices({ devices, isSmall }) {
         },
       ]}
       isSmall={isSmall}
+      dark={dark}
     />
   );
 }

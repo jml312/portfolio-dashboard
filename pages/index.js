@@ -4,11 +4,12 @@ import Navbar from "components/Navbar";
 import Analytics from "components/Analytics";
 import Submissions from "components/Submissions";
 import Services from "components/Services";
-import { Container, Group, Button } from "@mantine/core";
+import { Container, Group, Button, useMantineColorScheme } from "@mantine/core";
 import { ExternalLink } from "tabler-icons-react";
 import { getData } from "utils/getData";
 import { useState, useRef } from "react";
-import Footer from "components/Footer";
+import { NextSeo } from "next-seo";
+import SEO from "seo";
 
 const quickLinks = [
   {
@@ -35,8 +36,11 @@ export default function Home({ isAuthenticated, pageData }) {
   const analyticsRef = useRef();
   const submissionsRef = useRef();
   const servicesRef = useRef();
+  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+  const dark = colorScheme === "dark";
   return (
     <>
+      <NextSeo {...SEO} />
       <Container fluid>
         <Navbar
           isLoggedIn={isLoggedIn}
@@ -45,8 +49,10 @@ export default function Home({ isAuthenticated, pageData }) {
           analyticsRef={analyticsRef}
           submissionsRef={submissionsRef}
           servicesRef={servicesRef}
+          dark={dark}
+          toggleColorScheme={toggleColorScheme}
         />
-        <Container size={1200} px={0} my="xl">
+        <Container size={1200} px={0} my="xl" mb={5}>
           <Container fluid sx={{ margin: "5.5rem 0 -.25rem 0" }}>
             <Group spacing="lg">
               {quickLinks.map(({ name, href }) => (
@@ -67,6 +73,7 @@ export default function Home({ isAuthenticated, pageData }) {
             analytics={data.analytics}
             isLoggedIn={isLoggedIn}
             analyticsRef={analyticsRef}
+            dark={dark}
           />
           <Submissions
             submissions={data.submissions}
@@ -80,7 +87,6 @@ export default function Home({ isAuthenticated, pageData }) {
           />
         </Container>
       </Container>
-      <Footer />
     </>
   );
 }

@@ -14,9 +14,6 @@ import { useLocalStorage, useHotkeys } from "@mantine/hooks";
 import { NotificationsProvider } from "@mantine/notifications";
 import { ModalsProvider } from "@mantine/modals";
 import { useState } from "react";
-import { LazyMotion } from "framer-motion";
-import { NextSeo } from "next-seo";
-import SEO from "seo";
 
 function MyApp({ Component, pageProps }) {
   const [colorScheme, setColorScheme] = useLocalStorage({
@@ -74,17 +71,7 @@ function MyApp({ Component, pageProps }) {
           modals={{ confirm: ConfirmModal, content: ContentModal }}
         >
           <NotificationsProvider>
-            <LazyMotion
-              features={() =>
-                import("framerMotionFeatures").then(
-                  ({ default: features }) => features
-                )
-              }
-              strict
-            >
-              <NextSeo {...SEO} />
-              <Component {...pageProps} />
-            </LazyMotion>
+            <Component {...pageProps} />
           </NotificationsProvider>
         </ModalsProvider>
       </MantineProvider>

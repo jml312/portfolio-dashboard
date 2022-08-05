@@ -191,9 +191,9 @@ const getServices = (isLoggedIn = true) => {
     pricing: "-",
     expiresOn: "-",
   };
-  const formatAuthenticatedData = (data) => {
-    const [rateLimit, pricing, expiresOn, link] = data;
-    return data.reduce(
+  const formatAuthenticatedData = (_data) => {
+    const [rateLimit, pricing, expiresOn, link] = _data;
+    return _data.reduce(
       () => ({
         rateLimit: rateLimit === "null" ? "-" : rateLimit,
         pricing,
@@ -211,9 +211,14 @@ const getServices = (isLoggedIn = true) => {
           ...formatAuthenticatedData(process.env.EASY_CRON.split(",")),
         },
         {
-          name: "GoDaddy",
+          name: "GoDaddy Domain",
           service: "Domain",
-          ...formatAuthenticatedData(process.env.GODADDY.split(",")),
+          ...formatAuthenticatedData(process.env.GODADDY_DOMAIN.split(",")),
+        },
+        {
+          name: "GoDaddy Email",
+          service: "Email",
+          ...formatAuthenticatedData(process.env.GODADDY_EMAIL.split(",")),
         },
         {
           name: "ipapi",
@@ -251,10 +256,17 @@ const getServices = (isLoggedIn = true) => {
         },
         {
           ...unAuthenticatedData,
-          name: "GoDaddy",
+          name: "GoDaddy Domain",
           service: "Domain",
           expiresOn: null,
           link: "https://dashboard.godaddy.com/venture",
+        },
+        {
+          ...unAuthenticatedData,
+          name: "GoDaddy Email",
+          service: "Email",
+          expiresOn: null,
+          link: "https://productivity.godaddy.com/#/",
         },
         {
           name: "ipapi",

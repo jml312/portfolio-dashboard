@@ -23,6 +23,7 @@ export default function Analytics({
   },
   isLoggedIn,
   analyticsRef,
+  dark,
 }) {
   const [data, setData] = useState(all);
   const isSmall = useMediaQuery("(max-width: 450px)");
@@ -40,7 +41,7 @@ export default function Analytics({
       </Title>
       <Grid cols={2} gutter="lg">
         <Grid.Col sm={12} md={12}>
-          <Graph all={data} isSmall={isSmall} />
+          <Graph all={data} isSmall={isSmall} dark={dark} />
         </Grid.Col>
         <Grid.Col sm={12} md={6}>
           <Locations
@@ -51,10 +52,11 @@ export default function Analytics({
               countries: topCountries,
             }}
             isSmall={isSmall}
+            dark={dark}
           />
         </Grid.Col>
         <Grid.Col sm={12} md={6}>
-          <Pages pages={topPages} isSmall={isSmall} />
+          <Pages pages={topPages} isSmall={isSmall} dark={dark} />
         </Grid.Col>
         <Grid.Col sm={12} md={6}>
           <Devices
@@ -64,10 +66,11 @@ export default function Analytics({
               os: topOS,
             }}
             isSmall={isSmall}
+            dark={dark}
           />
         </Grid.Col>
         <Grid.Col sm={12} md={6}>
-          <Referrers referrers={topReferrers} isSmall={isSmall} />
+          <Referrers referrers={topReferrers} isSmall={isSmall} dark={dark} />
         </Grid.Col>
       </Grid>
       <Table data={data} setData={setData} isLoggedIn={isLoggedIn} />

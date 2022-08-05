@@ -3,7 +3,6 @@ import {
   Header,
   Group,
   ActionIcon,
-  useMantineColorScheme,
   Button,
   Container,
   TextInput,
@@ -127,13 +126,13 @@ export default function Navbar({
   submissionsRef,
   analyticsRef,
   servicesRef,
+  toggleColorScheme,
+  dark,
 }) {
   const [opened, { toggle, close }] = useDisclosure(false);
   const dropdownRef = useClickOutside(() => close());
   const isSmall = useMediaQuery("(max-width: 575px)");
   const { classes } = useStyles();
-  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
-  const dark = colorScheme === "dark";
   const modals = useModals();
   const openLoginModal = () => {
     const id = modals.openModal({
@@ -196,7 +195,7 @@ export default function Navbar({
                     }}
                     key={label}
                     onClick={() =>
-                      ref.current.scrollIntoView({
+                      ref?.current?.scrollIntoView({
                         behavior: "smooth",
                       })
                     }
@@ -241,7 +240,7 @@ export default function Navbar({
                       }}
                       key={label}
                       onClick={() => {
-                        ref.current.scrollIntoView({
+                        ref?.current?.scrollIntoView({
                           behavior: "smooth",
                         });
                         close();

@@ -1,6 +1,6 @@
 import AnalyticsCard from "./AnalyticsCard";
 
-export default function Pages({ referrers, isSmall }) {
+export default function Pages({ referrers, isSmall, dark }) {
   return (
     <AnalyticsCard
       title="Top Sources"
@@ -10,6 +10,7 @@ export default function Pages({ referrers, isSmall }) {
         referrer: el.referrer === "None" ? "Direct / None" : el.referrer,
       }))}
       isSmall={isSmall}
+      dark={dark}
     />
   );
 }

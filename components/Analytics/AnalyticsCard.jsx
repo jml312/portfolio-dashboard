@@ -1,11 +1,4 @@
-import {
-  Title,
-  Container,
-  Text,
-  Group,
-  useMantineColorScheme,
-  ScrollArea,
-} from "@mantine/core";
+import { Title, Container, Text, Group, ScrollArea } from "@mantine/core";
 import { useState } from "react";
 import abbreviate from "number-abbreviate";
 import dynamic from "next/dynamic";
@@ -17,6 +10,7 @@ export default function AnalyticsCard({
   tabs,
   data,
   isSmall,
+  dark,
 }) {
   const [activeTab, setActiveTab] = useState(tabs?.length && tabs[0]);
   const [activeData, setActiveData] = useState(
@@ -27,8 +21,6 @@ export default function AnalyticsCard({
     0
   );
   const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
-  const { colorScheme } = useMantineColorScheme();
-  const dark = colorScheme === "dark";
 
   return (
     <Container
@@ -120,24 +112,25 @@ export default function AnalyticsCard({
               height: "100%",
               padding: "0",
               position: "relative",
+              overflow: "hidden",
             }}
           >
             <Container
               sx={{
                 flexGrow: 1,
+                opacity: "1",
                 width: "100%",
                 height: "100%",
-                opacity: "1",
                 transition: "opacity .1s ease-in",
                 padding: "0",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
                 position: "absolute",
-                top: "0",
-                left: "0",
-                right: "0",
-                bottom: "0",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
                 paddingTop: ".9rem",
               }}
             >
