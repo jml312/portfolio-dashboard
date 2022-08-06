@@ -15,6 +15,7 @@ import axios from "axios";
 import { showNotification } from "@mantine/notifications";
 import { Trash, Minus } from "tabler-icons-react";
 import { format } from "date-fns";
+import abbreviate from "number-abbreviate";
 
 const useStyles = createStyles((theme) => ({
   rowSelected: {
@@ -168,7 +169,7 @@ export default function Table({ data, setData, isLoggedIn }) {
               textAlign: "left",
             }}
           >
-            {rows.length} Total Visitors
+            {abbreviate(rows.length, 1)} Total Visitors
           </caption>
           <thead>
             <tr>
