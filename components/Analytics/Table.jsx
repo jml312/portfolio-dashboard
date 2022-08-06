@@ -134,8 +134,7 @@ export default function Table({ data, setData, isLoggedIn }) {
               message: `Page ${pluralize("views", "view")} deleted.`,
               color: "green",
             });
-          } catch (e) {
-            console.log(e);
+          } catch {
             modals.closeModal(deleteModalId);
             showNotification({
               title: "Error",
