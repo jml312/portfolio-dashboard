@@ -255,7 +255,13 @@ export default function Table({ data, setData, isLoggedIn }) {
                         />
                       </td>
                       <td>{page}</td>
-                      <td>{referrer}</td>
+                      <td>
+                        {referrer.match(/(https:\/\/|http:\/\/)/gm)
+                          ? referrer
+                              .replace(/(https:\/\/www.|http:\/\/www.)/gm, "")
+                              .replace("/", "")
+                          : referrer}
+                      </td>
                       <td>{location}</td>
                       <td>{formatTime(timeSpent)}</td>
                       <td>{format(new Date(date), "MMM dd, yyyy h:mm a")}</td>

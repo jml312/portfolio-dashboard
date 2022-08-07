@@ -170,7 +170,6 @@ const getAnalyticsData = (analytics) => {
       }
       return acc;
     }, []);
-
   return {
     all: analytics,
     locations,

@@ -20,7 +20,14 @@ export default function AnalyticsCard({
     (acc, curr) => acc + curr.visitors,
     0
   );
-  const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+  const capitalize = (str) => {
+    if (str.toLowerCase() === "ios") return "IOS";
+    if (str.match(/(https:\/\/|http:\/\/)/gm))
+      return str
+        .replace(/(https:\/\/www.|http:\/\/www.)/gm, "")
+        .replace("/", "");
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  };
 
   return (
     <Container
