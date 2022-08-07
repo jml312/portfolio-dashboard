@@ -129,6 +129,7 @@ export default function Table({ data, setData, isLoggedIn }) {
             });
             setData([...updatedData]);
             setSelectedRows([]);
+            setPage(1);
             modals.closeModal(deleteModalId);
             showNotification({
               title: `Page ${pluralize("Views", "View")} Deleted`,
@@ -258,7 +259,10 @@ export default function Table({ data, setData, isLoggedIn }) {
                       <td>
                         {referrer.match(/(https:\/\/|http:\/\/)/gm)
                           ? referrer
-                              .replace(/(https:\/\/www.|http:\/\/www.)/gm, "")
+                              .replace(
+                                /(https:\/\/www.|http:\/\/www.|https:\/\/|http:\/\/)/gm,
+                                ""
+                              )
                               .replace("/", "")
                           : referrer}
                       </td>

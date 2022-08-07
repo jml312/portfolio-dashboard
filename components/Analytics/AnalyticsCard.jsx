@@ -24,8 +24,8 @@ export default function AnalyticsCard({
     if (str.toLowerCase() === "ios") return "IOS";
     if (str.match(/(https:\/\/|http:\/\/)/gm))
       return str
-        .replace(/(https:\/\/www.|http:\/\/www.)/gm, "")
-        .replace("/", "");
+        .replace(/(https:\/\/www.|http:\/\/www.|https:\/\/|http:\/\/)/gm, "")
+        .replace("/", "")
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
 

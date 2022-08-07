@@ -258,7 +258,9 @@ export default function Submissions({
               <tr>
                 <td colSpan={headers.length}>
                   <Text weight={500} align="center">
-                    Nothing found
+                    {submissions.length === 0
+                      ? "No submissions"
+                      : "Nothing found"}
                   </Text>
                 </td>
               </tr>
