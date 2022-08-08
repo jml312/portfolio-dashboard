@@ -186,7 +186,7 @@ export default function Navbar({
             )}
             <Group mr={3}>
               {isSmall ? (
-                <Burger opened={opened} onClick={toggle} size="sm" />
+                <Burger ml={-5} opened={opened} onClick={toggle} size="sm" />
               ) : (
                 links.map(({ label, ref }) => (
                   <Anchor

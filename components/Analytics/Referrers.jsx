@@ -5,10 +5,7 @@ export default function Pages({ referrers, isSmall, dark }) {
     <AnalyticsCard
       title="Top Sources"
       subTitle="Source"
-      data={referrers.map((el) => ({
-        ...el,
-        referrer: el.referrer === "None" ? "Direct / None" : el.referrer,
-      }))}
+      data={referrers}
       isSmall={isSmall}
       dark={dark}
     />

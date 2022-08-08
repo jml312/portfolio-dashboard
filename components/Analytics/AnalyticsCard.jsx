@@ -21,11 +21,11 @@ export default function AnalyticsCard({
     0
   );
   const capitalize = (str) => {
-    if (str.toLowerCase() === "ios") return "IOS";
+    if (str.toLowerCase().includes("ios")) return str.replace("ios", "IOS");
     if (str.match(/(https:\/\/|http:\/\/)/gm))
       return str
         .replace(/(https:\/\/www.|http:\/\/www.|https:\/\/|http:\/\/)/gm, "")
-        .replace("/", "")
+        .replace("/", "");
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
 

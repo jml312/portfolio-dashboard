@@ -8,6 +8,7 @@ import {
   Table as MantineTable,
   Checkbox,
   createStyles,
+  MultiSelect,
 } from "@mantine/core";
 import { useState, useRef, useMemo } from "react";
 import { useModals } from "@mantine/modals";
@@ -27,16 +28,15 @@ const useStyles = createStyles((theme) => ({
 }));
 
 export default function Table({ data, setData, isLoggedIn }) {
-  const rows = useMemo(
+  const allRows = useMemo(
     () =>
       data
-        .flatMap(({ page, slug, visitors }) =>
+        .flatMap(({ slug, visitors }) =>
           visitors.flatMap(({ viewings, device, os, browser, ip }) =>
             viewings.map(
               ({ locationShort, flag, date, timeSpent, referrer }) => ({
                 ip,
                 slug,
-                page,
                 referrer,
                 location: `${locationShort} ${flag}`,
                 timeSpent,
@@ -50,6 +50,17 @@ export default function Table({ data, setData, isLoggedIn }) {
           )
         )
         .sort((a, b) => new Date(b.date) - new Date(a.date)),
+    [data]
+  );
+  const [rows, setRows] = useState(allRows);
+  const cities = useMemo(
+    () =>
+      [...new Set(rows.map(({ location }) => location))]
+        .map((location) => ({
+          label: `${location.split(",").at(0)} ${location.split(" ").at(-1)}`,
+          value: location,
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
     [data]
   );
   const [activePage, setPage] = useState(1);
@@ -158,19 +169,40 @@ export default function Table({ data, setData, isLoggedIn }) {
       ? `${seconds.replace(".0", "")}s`
       : `${minutes}m`;
   };
-
   const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+  const getPageSlug = (pageSlug) => {
+    if (pageSlug === "home") return "/";
+    else if (pageSlug === "blog") return "/blog";
+    return `/blog/${pageSlug}`;
+  };
 
   return (
-    <Container fluid mt={16}>
+    <Container fluid mt={24}>
       <ScrollArea>
         <MantineTable>
-          <caption
-            style={{
-              textAlign: "left",
-            }}
-          >
-            {abbreviate(rows.length, 1)} Total Visitors
+          <caption>
+            <Group position="apart" grow align="end">
+              {abbreviate(rows.length, 1)} Total Visitors
+              <MultiSelect
+                sx={{
+                  maxWidth: "175px",
+                }}
+                maxDropdownHeight={300}
+                data={cities}
+                clearable
+                placeholder="Filter by city"
+                onChange={(value) => {
+                  if (value.length === 0) {
+                    setRows(allRows);
+                  } else {
+                    setRows(
+                      allRows.filter(({ location }) => value.includes(location))
+                    );
+                  }
+                  setPage(1);
+                }}
+              />
+            </Group>
           </caption>
           <thead>
             <tr>
@@ -217,7 +249,6 @@ export default function Table({ data, setData, isLoggedIn }) {
                 ({
                   slug,
                   ip,
-                  page,
                   referrer,
                   location,
                   timeSpent,
@@ -255,7 +286,7 @@ export default function Table({ data, setData, isLoggedIn }) {
                           transitionDuration={0}
                         />
                       </td>
-                      <td>{page}</td>
+                      <td>{getPageSlug(slug)}</td>
                       <td>
                         {referrer.match(/(https:\/\/|http:\/\/)/gm)
                           ? referrer
@@ -270,14 +301,8 @@ export default function Table({ data, setData, isLoggedIn }) {
                       <td>{formatTime(timeSpent)}</td>
                       <td>{format(new Date(date), "MMM dd, yyyy h:mm a")}</td>
                       <td>{device}</td>
-                      <td>
-                        {browser.toLowerCase() === "ios"
-                          ? "IOS"
-                          : capitalize(browser)}
-                      </td>
-                      <td>
-                        {os.toLowerCase() === "ios" ? "IOS" : capitalize(os)}
-                      </td>
+                      <td>{capitalize(browser.replace("ios", "IOS"))}</td>
+                      <td>{capitalize(os.replace("ios", "IOS"))}</td>
                       <td>{viewings}</td>
                     </tr>
                   );

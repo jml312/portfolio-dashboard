@@ -8,7 +8,7 @@ export default function Devices({ devices, isSmall, dark }) {
         ...devices,
         os: devices.os.map((el) => ({
           ...el,
-          os: el.os === "null" ? "Unknown" : el.os,
+          os: el.os === "null" ? "Unknown" : el.os.replace("iOS", "IOS"),
         })),
       }}
       tabs={[
