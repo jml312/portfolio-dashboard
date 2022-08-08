@@ -10,7 +10,7 @@ import {
   createStyles,
   MultiSelect,
 } from "@mantine/core";
-import { useState, useRef, useMemo, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useModals } from "@mantine/modals";
 import axios from "axios";
 import { showNotification } from "@mantine/notifications";
@@ -55,7 +55,7 @@ export default function Table({ data, setData, isLoggedIn }) {
     setRows(updatedRows);
     setAllRows(updatedRows);
     setAllCities(
-      [...new Set(rows.map(({ location }) => location))]
+      [...new Set(updatedRows.map(({ location }) => location))]
         .map((location) => ({
           label: `${location.split(",").at(0)} ${location.split(" ").at(-1)}`,
           value: location,
@@ -72,11 +72,9 @@ export default function Table({ data, setData, isLoggedIn }) {
     () => setRowsPerPage(rows.length >= 5 ? 10 : rows.length === 1 ? 1 : 5),
     [rows]
   );
-
   const TOTAL_PAGES = Math.max(Math.ceil(rows?.length / rowsPerPage), 1);
   const MAX_ROWS_PER_PAGE =
     rows.length === 1 ? 1 : Math.min(100, Math.ceil(rows.length / 5) * 5);
-
   const [selectedRows, setSelectedRows] = useState([]);
   const multipleSelectedRows = selectedRows.length > 1;
   const { classes, cx } = useStyles();
