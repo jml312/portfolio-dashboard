@@ -41,7 +41,12 @@ export default function Analytics({
       </Title>
       <Grid cols={2} gutter="lg">
         <Grid.Col sm={12} md={12}>
-          <Graph all={data} isSmall={isSmall} dark={dark} />
+          <Graph
+            all={data}
+            isSmall={isSmall}
+            dark={dark}
+            analyticsRef={analyticsRef}
+          />
         </Grid.Col>
         <Grid.Col sm={12} md={6}>
           <Locations

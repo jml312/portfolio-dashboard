@@ -45,7 +45,7 @@ const selectItem = forwardRef(({ label, ...others }, ref) => (
 ));
 selectItem.displayName = "SelectItem";
 
-export default function Graph({ all, isSmall, dark }) {
+export default function Graph({ all, isSmall, dark, analyticsRef }) {
   const [timeRange, setTimeRange] = useState("all-time");
   const [datasetTitle, setDatasetTitle] = useState("Unique Visitors");
   const [isLoading, setIsLoading] = useState(false);
@@ -175,11 +175,51 @@ export default function Graph({ all, isSmall, dark }) {
   }, [timeRange, all]);
 
   useHotkeys([
-    ["A", () => setTimeRange("all-time")],
-    ["Y", () => setTimeRange("year")],
-    ["M", () => setTimeRange("month")],
-    ["W", () => setTimeRange("week")],
-    ["D", () => setTimeRange("day")],
+    [
+      "A",
+      () => {
+        setTimeRange("all-time");
+        analyticsRef.current.scrollIntoView({
+          behavior: "smooth",
+        });
+      },
+    ],
+    [
+      "Y",
+      () => {
+        setTimeRange("year");
+        analyticsRef.current.scrollIntoView({
+          behavior: "smooth",
+        });
+      },
+    ],
+    [
+      "M",
+      () => {
+        setTimeRange("month");
+        analyticsRef.current.scrollIntoView({
+          behavior: "smooth",
+        });
+      },
+    ],
+    [
+      "W",
+      () => {
+        setTimeRange("week");
+        analyticsRef.current.scrollIntoView({
+          behavior: "smooth",
+        });
+      },
+    ],
+    [
+      "D",
+      () => {
+        setTimeRange("day");
+        analyticsRef.current.scrollIntoView({
+          behavior: "smooth",
+        });
+      },
+    ],
   ]);
 
   useEffect(() => {
