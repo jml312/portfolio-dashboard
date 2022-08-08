@@ -258,8 +258,8 @@ export default function Graph({ all, isSmall, dark }) {
           ref={selectRef}
           sx={{
             width: isSmall ? "100%" : "auto",
-            minWidth: !isSmall && "200px",
-            maxWidth: !isSmall && "200px",
+            minWidth: !isSmall && "175px",
+            maxWidth: !isSmall && "175px",
           }}
         />
       </div>

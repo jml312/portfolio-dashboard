@@ -28,41 +28,41 @@ const useStyles = createStyles((theme) => ({
 }));
 
 export default function Table({ data, setData, isLoggedIn }) {
-  const allRows = useMemo(
-    () =>
-      data
-        .flatMap(({ slug, visitors }) =>
-          visitors.flatMap(({ viewings, device, os, browser, ip }) =>
-            viewings.map(
-              ({ locationShort, flag, date, timeSpent, referrer }) => ({
-                ip,
-                slug,
-                referrer,
-                location: `${locationShort} ${flag}`,
-                timeSpent,
-                date,
-                device,
-                os,
-                browser,
-                viewings: viewings.length,
-              })
-            )
+  const [rows, setRows] = useState([]);
+  const [allRows, setAllRows] = useState([]);
+  const [allCities, setAllCities] = useState([]);
+  useEffect(() => {
+    const updatedRows = data
+      .flatMap(({ slug, visitors }) =>
+        visitors.flatMap(({ viewings, device, os, browser, ip }) =>
+          viewings.map(
+            ({ locationShort, flag, date, timeSpent, referrer }) => ({
+              ip,
+              slug,
+              referrer,
+              location: `${locationShort} ${flag}`,
+              timeSpent,
+              date,
+              device,
+              os,
+              browser,
+              viewings: viewings.length,
+            })
           )
         )
-        .sort((a, b) => new Date(b.date) - new Date(a.date)),
-    [data]
-  );
-  const [rows, setRows] = useState(allRows);
-  const cities = useMemo(
-    () =>
+      )
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
+    setRows(updatedRows);
+    setAllRows(updatedRows);
+    setAllCities(
       [...new Set(rows.map(({ location }) => location))]
         .map((location) => ({
           label: `${location.split(",").at(0)} ${location.split(" ").at(-1)}`,
           value: location,
         }))
-        .sort((a, b) => a.label.localeCompare(b.label)),
-    [data]
-  );
+        .sort((a, b) => a.label.localeCompare(b.label))
+    );
+  }, [data]);
   const [activePage, setPage] = useState(1);
   const numberInputRef = useRef();
   const [rowsPerPage, setRowsPerPage] = useState(
@@ -82,8 +82,12 @@ export default function Table({ data, setData, isLoggedIn }) {
   const { classes, cx } = useStyles();
   const toggleRow = ({ date, ip, slug }) =>
     setSelectedRows((current) =>
-      current.some((row) => row.date === date && row.ip === ip)
-        ? current.filter((item) => item.date !== date)
+      current.some(
+        (row) => row.date === date && row.ip === ip && row.slug === slug
+      )
+        ? current.filter(
+            (item) => item.date !== date && item.ip !== ip && item.slug !== slug
+          )
         : [...current, { date, ip, slug }]
     );
 
@@ -122,17 +126,28 @@ export default function Table({ data, setData, isLoggedIn }) {
             await axios.delete("/api/views/delete", {
               data: groupedIPS,
             });
-            const updatedData = data.map(({ visitors, ...rest }) => {
+            const filteredData = data.map(({ visitors, slug, ...rest }) => {
               const filteredVisitors = visitors.map(
                 ({ viewings, ip: viewIp, ...viewingsRest }) => {
                   const filteredViewings = viewings.filter(
-                    ({ date: viewDate }) =>
-                      !selectedRows.some(
-                        ({ date: selectedDate, ip: selectedIp }) =>
-                          viewDate === selectedDate && viewIp === selectedIp
-                      )
+                    ({ date: viewDate }) => {
+                      return !selectedRows.some(
+                        ({
+                          date: selectedDate,
+                          ip: selectedIp,
+                          slug: selectedSlug,
+                        }) =>
+                          viewDate === selectedDate &&
+                          viewIp === selectedIp &&
+                          slug === selectedSlug
+                      );
+                    }
                   );
-                  return { viewings: filteredViewings, ...viewingsRest };
+                  return {
+                    viewings: filteredViewings,
+                    ip: viewIp,
+                    ...viewingsRest,
+                  };
                 }
               );
               return {
@@ -141,10 +156,11 @@ export default function Table({ data, setData, isLoggedIn }) {
                   (acc, { viewings }) => acc + viewings.length,
                   0
                 ),
+                slug,
                 visitors: filteredVisitors,
               };
             });
-            setData([...updatedData]);
+            setData([...filteredData]);
             setSelectedRows([]);
             setPage(1);
             modals.closeModal(deleteModalId);
@@ -195,7 +211,7 @@ export default function Table({ data, setData, isLoggedIn }) {
                   maxWidth: "175px",
                 }}
                 maxDropdownHeight={300}
-                data={cities}
+                data={allCities}
                 clearable
                 placeholder="Filter by city"
                 onChange={(value) => {
@@ -266,7 +282,8 @@ export default function Table({ data, setData, isLoggedIn }) {
                   viewings,
                 }) => {
                   const isSelected = selectedRows.some(
-                    (row) => row.date === date && row.ip === ip
+                    (row) =>
+                      row.date === date && row.ip === ip && row.slug === slug
                   );
                   return (
                     <tr
