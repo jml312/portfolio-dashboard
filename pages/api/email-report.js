@@ -159,11 +159,11 @@ export default async function handler(req, res) {
     const analyticsMessage =
       vdVal > 0
         ? `Unique Visitors: <b>${abbreviate(uvVal, 1)} ${
-            uvDiff && `(${uvDiff}%)</b>`
-          }<br>Total Visitors: <b>${abbreviate(tvVal, 1)} ${
-            tvDiff && `(${tvDiff}%)</b>`
-          }<br>Visit Durations (avg): <b>${formatTime(vdVal)} ${
-            vdDiff && `(${vdDiff}%)</b>`
+            uvDiff ? `(${uvDiff}%)` : ""
+          }</b><br>Total Visitors: <b>${abbreviate(tvVal, 1)} ${
+            tvDiff ? `(${tvDiff}%)` : ""
+          }</b><br>Visit Durations (avg): <b>${formatTime(vdVal)} ${
+            vdDiff ? `(${vdDiff}%)</b>` : ""
           }</b>`
         : "No visitors this week";
 
