@@ -102,10 +102,11 @@ const getTimeRangeData = (timeRange) => {
         })),
       };
     case "week":
+      const day = now.getDate();
       return {
         current: eachDayOfInterval({
-          start: set(now, { date: 1 }),
-          end: set(now, { date: 7 }),
+          start: set(now, { date: day }),
+          end: set(now, { date: day + 6 }),
         }).map((date) => ({
           regular: date,
           formatted: format(date, dateFormats["week"]),
@@ -115,8 +116,8 @@ const getTimeRangeData = (timeRange) => {
           }),
         })),
         previous: eachDayOfInterval({
-          start: subWeeks(set(now, { date: 1 }), 1),
-          end: subWeeks(set(now, { date: 7 }), 1),
+          start: subWeeks(set(now, { date: day }), 1),
+          end: subWeeks(set(now, { date: day + 6 }), 1),
         }).map((date) => ({
           regular: date,
           formatted: format(date, dateFormats["week"]),
