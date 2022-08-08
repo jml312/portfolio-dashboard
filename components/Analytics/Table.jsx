@@ -10,7 +10,7 @@ import {
   createStyles,
   MultiSelect,
 } from "@mantine/core";
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import { useModals } from "@mantine/modals";
 import axios from "axios";
 import { showNotification } from "@mantine/notifications";
@@ -68,8 +68,14 @@ export default function Table({ data, setData, isLoggedIn }) {
   const [rowsPerPage, setRowsPerPage] = useState(
     rows.length >= 5 ? 10 : rows.length === 1 ? 1 : 5
   );
+  useEffect(
+    () => setRowsPerPage(rows.length >= 5 ? 10 : rows.length === 1 ? 1 : 5),
+    [rows]
+  );
+
   const TOTAL_PAGES = Math.max(Math.ceil(rows?.length / rowsPerPage), 1);
-  const MAX_ROWS_PER_PAGE = Math.min(100, Math.ceil(rows.length / 5) * 5);
+  const MAX_ROWS_PER_PAGE =
+    rows.length === 1 ? 1 : Math.min(100, Math.ceil(rows.length / 5) * 5);
 
   const [selectedRows, setSelectedRows] = useState([]);
   const multipleSelectedRows = selectedRows.length > 1;
@@ -182,7 +188,8 @@ export default function Table({ data, setData, isLoggedIn }) {
         <MantineTable>
           <caption>
             <Group position="apart" grow align="end">
-              {abbreviate(rows.length, 1)} Total Visitors
+              {abbreviate(allRows.length, 1)} Total Visitor
+              {allRows.length === 1 ? "" : "s"}
               <MultiSelect
                 sx={{
                   maxWidth: "175px",
