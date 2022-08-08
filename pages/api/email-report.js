@@ -162,7 +162,7 @@ export default async function handler(req, res) {
             uvDiff ? `(${uvDiff}%)` : ""
           }</b><br>Total Visitors: <b>${abbreviate(tvVal, 1)} ${
             tvDiff ? `(${tvDiff}%)` : ""
-          }</b><br>Visit Durations (avg): <b>${formatTime(vdVal)} ${
+          }</b><br>Visit Duration: <b>${formatTime(vdVal)} ${
             vdDiff ? `(${vdDiff}%)</b>` : ""
           }</b>`
         : "No visitors this week";
