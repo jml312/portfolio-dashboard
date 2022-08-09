@@ -16,6 +16,14 @@ const SEO = {
       "React",
     ],
     site_name: "dashboard.joshlevy.io",
+    images: [
+      {
+        url: `https://dashboard.joshlevy.io/assets/dashboard.png`,
+        width: 800,
+        height: 600,
+        alt: "dashboard.joshlevy.io",
+      },
+    ],
   },
   title: "dashboard – joshlevy.io",
   description: "A dashboard for Josh Levy's personal website, joshlevy.io",

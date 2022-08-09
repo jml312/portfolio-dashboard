@@ -12,6 +12,7 @@ import {
   Container,
   Pagination,
   NumberInput,
+  Tooltip,
 } from "@mantine/core";
 import { Search, Check, Trash, ArrowsMaximize } from "tabler-icons-react";
 import { format } from "date-fns";
@@ -159,6 +160,20 @@ export default function Submissions({
     }
   }, [activeRowId, activeRowActionType]);
 
+  const shortenWithTooltip = (text) => {
+    if (text.length > 13) {
+      return (
+        <Tooltip label={text}>
+          <span>
+            {text.substring(0, 13)}
+            {isLoggedIn && "..."}
+          </span>
+        </Tooltip>
+      );
+    }
+    return text;
+  };
+
   return (
     <Container
       fluid
@@ -198,11 +213,14 @@ export default function Submissions({
                 .slice((activePage - 1) * rowsPerPage, activePage * rowsPerPage)
                 .map(({ _id, name, email, message, date, isRead }) => (
                   <tr key={_id}>
-                    <td>{name}</td>
+                    <td>{shortenWithTooltip(name)}</td>
                     <td>
                       <Anchor href={isLoggedIn ? `mailto:${email}` : undefined}>
-                        {email}
+                        {shortenWithTooltip(email)}
                       </Anchor>
+                      {/* <Anchor href={isLoggedIn ? `mailto:${email}` : undefined}>
+                        {email}
+                      </Anchor> */}
                     </td>
                     <td>
                       <ActionIcon
