@@ -70,7 +70,7 @@ export default function StatCard({
           <MantineTitle order={3}>
             {isTime ? formatTime(value) : abbreviate(value, 1)}
           </MantineTitle>
-          {diff ? (
+          {diff && (
             <Center>
               {isPositiveDiff ? (
                 <ArrowUp size={16} color="#10B981" />
@@ -81,8 +81,6 @@ export default function StatCard({
                 {abbreviate(diff, 1).toString().replace("-", "")}%
               </Text>
             </Center>
-          ) : (
-            <Text size="xs">–</Text>
           )}
         </Group>
       </Stack>

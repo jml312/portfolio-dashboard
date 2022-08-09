@@ -1,16 +1,22 @@
 import {
   format,
-  eachDayOfInterval,
-  eachHourOfInterval,
-  eachMonthOfInterval,
-  subDays,
-  subWeeks,
-  subMonths,
   closestTo,
   isWithinInterval,
-  set,
+  eachHourOfInterval,
+  startOfDay,
+  endOfDay,
+  subDays,
+  eachDayOfInterval,
+  startOfWeek,
+  endOfWeek,
+  subWeeks,
+  startOfMonth,
+  endOfMonth,
+  subMonths,
+  eachMonthOfInterval,
+  startOfYear,
+  endOfYear,
   subYears,
-  getDaysInMonth,
 } from "date-fns";
 
 const dateFormats = {
@@ -55,19 +61,19 @@ const getTimeRangeData = (timeRange) => {
     case "year":
       return {
         current: eachMonthOfInterval({
-          start: set(now, { month: 0, day: 1 }),
-          end: set(now, { month: 11, day: 31 }),
+          start: startOfYear(now),
+          end: endOfYear(now),
         }).map((date) => ({
           regular: date,
           formatted: format(date, dateFormats["year"]),
           isCurrent: isWithinInterval(date, {
-            start: set(now, { month: -1, day: 1 }),
+            start: startOfYear(now),
             end: now,
           }),
         })),
         previous: eachMonthOfInterval({
-          start: subYears(set(now, { month: 0, day: 1 }), 1),
-          end: subYears(set(now, { month: 11, day: 31 }), 1),
+          start: subYears(startOfYear(now), 1),
+          end: subYears(endOfYear(now), 1),
         }).map((date) => ({
           regular: date,
           formatted: format(date, dateFormats["year"]),
@@ -76,48 +82,40 @@ const getTimeRangeData = (timeRange) => {
     case "month":
       return {
         current: eachDayOfInterval({
-          start: set(now, { date: 1 }),
-          end: set(now, {
-            date: getDaysInMonth(now),
-          }),
+          start: startOfMonth(now),
+          end: endOfMonth(now),
         }).map((date) => ({
           regular: date,
           formatted: format(date, dateFormats["month"]),
           isCurrent: isWithinInterval(date, {
-            start: set(now, { date: 0 }),
+            start: startOfMonth(now),
             end: now,
           }),
         })),
         previous: eachDayOfInterval({
-          start: subMonths(set(now, { date: 1 }), 1),
-          end: subMonths(
-            set(now, {
-              date: getDaysInMonth(now),
-            }),
-            1
-          ),
+          start: subMonths(startOfMonth(now), 1),
+          end: subMonths(endOfMonth(now), 1),
         }).map((date) => ({
           regular: date,
           formatted: format(date, dateFormats["month"]),
         })),
       };
     case "week":
-      const day = now.getDate();
       return {
         current: eachDayOfInterval({
-          start: set(now, { date: day }),
-          end: set(now, { date: day + 6 }),
+          start: startOfWeek(now, { weekStartsOn: 1 }),
+          end: endOfWeek(now, { weekStartsOn: 1 }),
         }).map((date) => ({
           regular: date,
           formatted: format(date, dateFormats["week"]),
           isCurrent: isWithinInterval(date, {
-            start: set(now, { date: 0 }),
+            start: startOfWeek(now, { weekStartsOn: 1 }),
             end: now,
           }),
         })),
         previous: eachDayOfInterval({
-          start: subWeeks(set(now, { date: day }), 1),
-          end: subWeeks(set(now, { date: day + 6 }), 1),
+          start: subWeeks(startOfWeek(now, { weekStartsOn: 1 }), 1),
+          end: subWeeks(endOfWeek(now, { weekStartsOn: 1 }), 1),
         }).map((date) => ({
           regular: date,
           formatted: format(date, dateFormats["week"]),
@@ -126,19 +124,19 @@ const getTimeRangeData = (timeRange) => {
     case "day":
       return {
         current: eachHourOfInterval({
-          start: set(now, { hours: 0 }),
-          end: set(now, { hours: 23 }),
+          start: startOfDay(now),
+          end: endOfDay(now),
         }).map((date) => ({
           regular: date,
           formatted: format(date, dateFormats["day"]),
           isCurrent: isWithinInterval(date, {
-            start: set(now, { hours: -1 }),
+            start: startOfDay(now),
             end: now,
           }),
         })),
         previous: eachHourOfInterval({
-          start: subDays(set(now, { hours: 0 }), 1),
-          end: subDays(set(now, { hours: 23 }), 1),
+          start: subDays(startOfDay(now), 1),
+          end: subDays(endOfDay(now), 1),
         }).map((date) => ({
           regular: date,
           formatted: format(date, dateFormats["day"]),
