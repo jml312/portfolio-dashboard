@@ -56,7 +56,12 @@ const getTimeRangeData = (timeRange) => {
             formatted: format(date, dateFormats["all-time"]),
           }))
           .filter((_, idx) => idx % 2 === 0),
-        previous: [],
+        previous: [
+          {
+            regular: new Date(2022, 7, 5),
+            formatted: format(new Date(2022, 7, 5), dateFormats["all-time"]),
+          },
+        ],
       };
     case "year":
       return {

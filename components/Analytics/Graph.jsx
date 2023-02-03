@@ -78,13 +78,35 @@ export default function Graph({ all, isSmall, dark, analyticsRef }) {
         labels,
       })
     ).reduce((acc, curr) => acc + curr, 0);
-    return {
-      counts,
-      value,
-      diff:
+    const sortedCounts = Object.keys(counts)
+      .sort((a, b) => new Date(a) - new Date(b))
+      .reduce((acc, curr) => {
+        acc[curr] = counts[curr];
+        return acc;
+      }, {});
+
+    let diff;
+    if (timeRange === "all-time") {
+      const sortedCountsKeys = Object.keys(sortedCounts);
+      const sortedCountsKeysLength = sortedCountsKeys.length;
+      const originalValue = sortedCounts[sortedCountsKeys[0]];
+      const newValue =
+        sortedCounts[sortedCountsKeys[sortedCountsKeysLength - 1]];
+      diff =
+        originalValue > 0
+          ? (((newValue - originalValue) / originalValue) * 100).toFixed(0)
+          : null;
+    } else {
+      diff =
         previousValue > 0
           ? (((value - previousValue) / previousValue) * 100).toFixed(0)
-          : null,
+          : null;
+    }
+
+    return {
+      counts: sortedCounts,
+      value,
+      diff,
     };
   }, [timeRange, all]);
   const totalVisitors = useMemo(() => {
@@ -111,13 +133,35 @@ export default function Graph({ all, isSmall, dark, analyticsRef }) {
         labels,
       })
     ).reduce((acc, curr) => acc + curr, 0);
-    return {
-      counts,
-      value,
-      diff:
+
+    const sortedCounts = Object.keys(counts)
+      .sort((a, b) => new Date(a) - new Date(b))
+      .reduce((acc, curr) => {
+        acc[curr] = counts[curr];
+        return acc;
+      }, {});
+    let diff;
+    if (timeRange === "all-time") {
+      const sortedCountsKeys = Object.keys(sortedCounts);
+      const sortedCountsKeysLength = sortedCountsKeys.length;
+      const originalValue = sortedCounts[sortedCountsKeys[0]];
+      const newValue =
+        sortedCounts[sortedCountsKeys[sortedCountsKeysLength - 1]];
+      diff =
+        originalValue > 0
+          ? (((newValue - originalValue) / originalValue) * 100).toFixed(0)
+          : null;
+    } else {
+      diff =
         previousValue > 0
           ? (((value - previousValue) / previousValue) * 100).toFixed(0)
-          : null,
+          : null;
+    }
+
+    return {
+      counts: sortedCounts,
+      value,
+      diff,
     };
   }, [timeRange, all]);
   const visitDurations = useMemo(() => {
@@ -164,13 +208,35 @@ export default function Graph({ all, isSmall, dark, analyticsRef }) {
         0
       ) / Object.keys(timeCounts).length
     );
-    return {
-      counts,
-      value,
-      diff:
+
+    const sortedCounts = Object.keys(counts)
+      .sort((a, b) => new Date(a) - new Date(b))
+      .reduce((acc, curr) => {
+        acc[curr] = counts[curr];
+        return acc;
+      }, {});
+    let diff;
+    if (timeRange === "all-time") {
+      const sortedCountsKeys = Object.keys(sortedCounts);
+      const sortedCountsKeysLength = sortedCountsKeys.length;
+      const originalValue = sortedCounts[sortedCountsKeys[0]];
+      const newValue =
+        sortedCounts[sortedCountsKeys[sortedCountsKeysLength - 1]];
+      diff =
+        originalValue > 0
+          ? (((newValue - originalValue) / originalValue) * 100).toFixed(0)
+          : null;
+    } else {
+      diff =
         previousValue > 0
           ? (((value - previousValue) / previousValue) * 100).toFixed(0)
-          : null,
+          : null;
+    }
+
+    return {
+      counts: sortedCounts,
+      value,
+      diff,
     };
   }, [timeRange, all]);
 
