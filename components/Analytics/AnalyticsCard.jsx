@@ -2,7 +2,7 @@ import { Title, Container, Text, Group, ScrollArea } from "@mantine/core";
 import { useState } from "react";
 import abbreviate from "number-abbreviate";
 import dynamic from "next/dynamic";
-const Map = dynamic(() => import("./Map"), { ssr: false });
+const LocationMap = dynamic(() => import("./LocationMap"), { ssr: false });
 
 export default function AnalyticsCard({
   title,
@@ -141,7 +141,7 @@ export default function AnalyticsCard({
                 paddingTop: ".9rem",
               }}
             >
-              <Map data={activeData} dark={dark} />
+              <LocationMap data={activeData} dark={dark} />
             </Container>
           </Container>
         ) : (

@@ -3,7 +3,7 @@ import { useState, useEffect, memo } from "react";
 import { LoadingOverlay, ActionIcon, Tooltip } from "@mantine/core";
 import { MapPin, FocusCentered } from "tabler-icons-react";
 
-const Map = memo(function Map({ data, dark }) {
+function LocationMap({ data, dark }) {
   const initialViewState = {
     latitude: 37.0902,
     longitude: -95.7129,
@@ -74,25 +74,27 @@ const Map = memo(function Map({ data, dark }) {
           </Tooltip>
         </ActionIcon>
 
-        {data.map(({ location, latLong, visitors }) => {
-          const [lat, long] = latLong.split(", ");
-          return (
-            <Marker
-              key={latLong}
-              latitude={lat}
-              longitude={long}
-              anchor="bottom"
-            >
-              <MapPin
-                onMouseEnter={() =>
-                  setPopupInfo({ location, lat, long, visitors })
-                }
-                onMouseLeave={() => setPopupInfo(null)}
-                color="rgba(34,139,230,.85)"
-              />
-            </Marker>
-          );
-        })}
+        {data
+          .filter(({ latLong }) => latLong !== "null, null")
+          .map(({ location, latLong, visitors }) => {
+            const [lat, long] = latLong.split(", ");
+            return (
+              <Marker
+                key={latLong}
+                latitude={lat}
+                longitude={long}
+                anchor="bottom"
+              >
+                <MapPin
+                  onMouseEnter={() =>
+                    setPopupInfo({ location, lat, long, visitors })
+                  }
+                  onMouseLeave={() => setPopupInfo(null)}
+                  color="rgba(34,139,230,.85)"
+                />
+              </Marker>
+            );
+          })}
         {popupInfo && (
           <Popup
             anchor="top"
@@ -114,6 +116,6 @@ const Map = memo(function Map({ data, dark }) {
       </ReactMapGL>
     </>
   );
-});
+}
 
-export default Map;
+export default memo(LocationMap);

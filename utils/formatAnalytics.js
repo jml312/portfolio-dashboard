@@ -44,12 +44,14 @@ const getDateFormat = (timeRange) => {
 
 const getTimeRangeData = (timeRange) => {
   const now = new Date();
+  const START_DATE = new Date(2022, 7, 5); // all-time start date
   switch (timeRange) {
     case "all-time":
       return {
         current: eachMonthOfInterval({
-          start: new Date(2022, 7, 5), // all-time start date
-          end: now,
+          start: START_DATE,
+          end: new Date(2023, 4, 5),
+          // end: now,
         })
           .map((date) => ({
             regular: date,
@@ -58,8 +60,8 @@ const getTimeRangeData = (timeRange) => {
           .filter((_, idx) => idx % 2 === 0),
         previous: [
           {
-            regular: new Date(2022, 7, 5),
-            formatted: format(new Date(2022, 7, 5), dateFormats["all-time"]),
+            regular: START_DATE,
+            formatted: format(START_DATE, dateFormats["all-time"]),
           },
         ],
       };

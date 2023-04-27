@@ -62,7 +62,9 @@ export default function Graph({ all, isSmall, dark, analyticsRef }) {
           .filter((v) => v.length)
           .map((_el) => _el.slice(-1))
           .map((__el) => new Date(__el[0].date))
-      );
+      )
+      .sort((a, b) => new Date(a) - new Date(b));
+
     const counts = formatDateCounts({
       data: analyticsData,
       dataKey: "current",
@@ -133,7 +135,6 @@ export default function Graph({ all, isSmall, dark, analyticsRef }) {
         labels,
       })
     ).reduce((acc, curr) => acc + curr, 0);
-
     const sortedCounts = Object.keys(counts)
       .sort((a, b) => new Date(a) - new Date(b))
       .reduce((acc, curr) => {
